@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>午餐報名表單</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ec;
+    --paper: #fffdf8;
+    --ink: #2c1a0e;
+    --accent: #c0392b;
+    --gold: #d4a94a;
+    --border: #d6c4a8;
+    --muted: #7a6050;
+    --shadow: rgba(44,26,14,0.10);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(212,169,74,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(192,57,43,0.08) 0%, transparent 50%);
+    font-family: 'Noto Sans TC', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .container { width: 100%; max-width: 560px; animation: fadeUp 0.6s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+
+  .header { text-align: center; margin-bottom: 32px; }
+  .tag { display:inline-block; font-size:11px; letter-spacing:4px; color:var(--accent); border:1px solid var(--accent); padding:4px 14px; margin-bottom:14px; }
+  .header h1 { font-family:'Noto Serif TC',serif; font-size:36px; font-weight:700; color:var(--ink); letter-spacing:2px; }
+  .header p { margin-top:8px; font-size:13px; color:var(--muted); letter-spacing:1px; }
+  .divider { display:flex; align-items:center; gap:10px; margin:18px auto; width:180px; }
+  .divider span { flex:1; height:1px; background:var(--gold); opacity:.6; }
+  .divider em { font-style:normal; color:var(--gold); font-size:14px; }
+
+  .card {
+    background: var(--paper); border:1px solid var(--border); border-radius:4px;
+    padding:36px 40px; box-shadow:0 6px 32px var(--shadow); position:relative;
+  }
+  .card::before {
+    content:''; position:absolute; top:6px; left:6px; right:-6px; bottom:-6px;
+    border:1px solid var(--border); border-radius:4px; z-index:-1; opacity:.4;
+  }
+
+  .field { margin-bottom: 20px; }
+  .field label { display:block; font-size:12px; letter-spacing:2px; color:var(--muted); margin-bottom:8px; font-weight:500; }
+  .field label .req { color:var(--accent); margin-left:2px; }
+  input[type="text"], textarea {
+    width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:2px;
+    background:#fdf9f3; font-family:'Noto Sans TC',sans-serif; font-size:15px; color:var(--ink);
+    outline:none; transition:border-color .2s, box-shadow .2s;
+  }
+  input:focus, textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,169,74,.12); }
+  textarea { resize:vertical; min-height:72px; font-size:14px; }
+
+  .meal-label { font-size:12px; letter-spacing:2px; color:var(--muted); margin-bottom:12px; display:block; font-weight:500; }
+  .meal-label .req { color:var(--accent); }
+  .options { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  .option input[type="radio"] { display:none; }
+  .option label {
+    cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:18px 10px 14px; border:1.5px solid var(--border); border-radius:4px;
+    background:#fdf9f3; transition:all .2s; font-size:14px; color:var(--ink); position:relative;
+  }
+  .option label:hover { border-color:var(--gold); box-shadow:0 2px 12px rgba(212,169,74,.15); }
+  .option input:checked + label { border-color:var(--accent); background:#fff5f4; box-shadow:0 2px 16px rgba(192,57,43,.1); }
+  .option input:checked + label .check { opacity:1; transform:scale(1); }
+  .check {
+    position:absolute; top:8px; right:8px; width:18px; height:18px;
+    background:var(--accent); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transform:scale(0.5); transition:all .2s;
+  }
+  .check::after { content:'✓'; color:white; font-size:10px; font-weight:700; }
+  .emoji { font-size:28px; line-height:1; }
+  .meal-name { font-family:'Noto Serif TC',serif; font-size:14px; font-weight:600; color:var(--ink); letter-spacing:1px; }
+
+  .submit-btn {
+    width:100%; margin-top:28px; padding:14px;
+    background:var(--ink); color:#fdf6ec; border:none;
+    font-family:'Noto Serif TC',serif; font-size:15px; letter-spacing:4px;
+    cursor:pointer; border-radius:2px; transition:background .2s, transform .1s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .submit-btn:hover { background:var(--accent); }
+  .submit-btn:active { transform:scale(.99); }
+  .submit-btn:disabled { background:#999; cursor:not-allowed; }
+
+  .spinner {
+    width:16px; height:16px; border:2px solid rgba(255,255,255,0.3);
+    border-top-color:white; border-radius:50%;
+    animation:spin .7s linear infinite; display:none;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .success-msg { display:none; text-align:center; padding:40px 20px; animation:fadeUp .5s ease both; }
+  .s-icon { font-size:48px; margin-bottom:16px; }
+  .success-msg h2 { font-family:'Noto Serif TC',serif; font-size:22px; color:var(--ink); margin-bottom:8px; }
+  .success-msg p { font-size:14px; color:var(--muted); }
+  .s-detail { margin-top:20px; padding:16px 20px; background:#fdf9f3; border:1px solid var(--border); border-radius:4px; font-size:14px; color:var(--ink); text-align:left; line-height:2.2; }
+  .s-detail span { color:var(--accent); font-weight:600; }
+  .reset-btn { margin-top:18px; background:none; border:1px solid var(--border); padding:8px 20px; font-family:'Noto Sans TC',sans-serif; font-size:13px; color:var(--muted); cursor:pointer; border-radius:2px; letter-spacing:1px; transition:border-color .2s; }
+  .reset-btn:hover { border-color:var(--ink); color:var(--ink); }
+
+  .error-msg { display:none; margin-top:14px; padding:12px 16px; background:#fff0f0; border:1px solid #f5c4c4; border-radius:4px; font-size:13px; color:#c0392b; text-align:center; }
+
+  @media (max-width:480px) {
+    .card { padding:28px 22px; }
+    .options { gap:8px; }
+    .option label { padding:14px 6px 12px; }
+    .emoji { font-size:22px; }
+    .meal-name { font-size:13px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="tag">午餐訂餐</div>
+    <h1>菜單報名</h1>
+    <div class="divider"><span></span><em>✦</em><span></span></div>
+    <p>請填寫您的資料並選擇今日餐點</p>
+  </div>
+
+  <div class="card">
+    <div id="form-content">
+      <div class="field">
+        <label>姓名 <span class="req">*</span></label>
+        <input type="text" id="f-name" placeholder="請輸入您的姓名">
+      </div>
+      <div class="field">
+        <label>部門／組別</label>
+        <input type="text" id="f-dept" placeholder="例：行政部、研發組">
+      </div>
+      <div class="field">
+        <span class="meal-label">餐點選擇 <span class="req">*</span></span>
+        <div class="options">
+          <div class="option">
+            <input type="radio" name="meal" id="meal1" value="排骨飯">
+            <label for="meal1">
+              <div class="check"></div>
+              <span class="emoji">🥩</span>
+              <span class="meal-name">排骨飯</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="meal" id="meal2" value="雞排飯">
+            <label for="meal2">
+              <div class="check"></div>
+              <span class="emoji">🍗</span>
+              <span class="meal-name">雞排飯</span>
+            </label>
+          </div>
+          <div class="option">
+            <input type="radio" name="meal" id="meal3" value="雞腿飯">
+            <label for="meal3">
+              <div class="check"></div>
+              <span class="emoji">🍖</span>
+              <span class="meal-name">雞腿飯</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>備註</label>
+        <textarea id="f-note" placeholder="例：不要香菜、少辣…"></textarea>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+        <div class="spinner" id="spinner"></div>
+        <span id="btn-text">確認送出報名</span>
+      </button>
+      <div class="error-msg" id="error-msg">送出失敗，請稍後再試或確認網路連線。</div>
+    </div>
+
+    <div class="success-msg" id="success-msg">
+      <div class="s-icon">🎉</div>
+      <h2>報名成功！</h2>
+      <p>您的餐點已登記，請準時用餐</p>
+      <div class="s-detail" id="s-detail"></div>
+      <button class="reset-btn" onclick="resetForm()">繼續新增報名</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyW5LPWRCnOkiznzHmTASj9W6ZbCt-49iQAv6I3YrKZcY6CmG_RKWZf2D6mxv4-yW5EWw/exec';
+
+  async function submitForm() {
+    const name = document.getElementById('f-name').value.trim();
+    const dept = document.getElementById('f-dept').value.trim();
+    const meal = document.querySelector('input[name="meal"]:checked');
+    const note = document.getElementById('f-note').value.trim();
+
+    if (!name) { alert('請輸入姓名'); document.getElementById('f-name').focus(); return; }
+    if (!meal)  { alert('請選擇餐點'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btn-text');
+    const errorMsg = document.getElementById('error-msg');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = '送出中…';
+    errorMsg.style.display = 'none';
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, dept, meal: meal.value, note })
+      });
+
+      let d = `<strong>姓名：</strong>${name}`;
+      if (dept) d += `<br><strong>部門：</strong>${dept}`;
+      d += `<br><strong>餐點：</strong><span>${meal.value}</span>`;
+      if (note) d += `<br><strong>備註：</strong>${note}`;
+      document.getElementById('s-detail').innerHTML = d;
+      document.getElementById('form-content').style.display = 'none';
+      document.getElementById('success-msg').style.display = 'block';
+
+    } catch (err) {
+      errorMsg.style.display = 'block';
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = '確認送出報名';
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-dept').value = '';
+    document.getElementById('f-note').value = '';
+    document.querySelectorAll('input[name="meal"]').forEach(r => r.checked = false);
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = false;
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btn-text').textContent = '確認送出報名';
+    document.getElementById('form-content').style.display = 'block';
+    document.getElementById('success-msg').style.display = 'none';
+  }
+</script>
+</body>
+</html>
